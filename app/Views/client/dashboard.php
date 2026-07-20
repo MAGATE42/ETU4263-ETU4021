@@ -3,9 +3,9 @@
 <!-- Navbar Client -->
 <nav class="navbar navbar-expand-lg navbar-light navbar-orange mb-4">
     <div class="container">
-        <a class="navbar-brand navbar-brand-text" href="/client/dashboard">
-            <div class="brand-circle">O</div>
-            Orange Money
+        <a class="navbar-brand navbar-brand-text" href="/client">
+            <img src="<?= base_url('img/logo.png') ?>" alt="Orange Money" class="brand-logo">
+            <span>Orange Money</span>
         </a>
         <div class="d-flex align-items-center gap-3">
             <span class="badge bg-orange-light text-orange border px-3 py-2">
@@ -115,7 +115,7 @@
             <div class="card p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-bold mb-0">Dernières opérations</h5>
-                    <a href="/client/historiques" class="text-orange text-decoration-none">Tout voir</a>
+                        <a href="/client/historique" class="btn btn-sm btn-outline-orange mt-2">voir plus</a>
                 </div>
                 
                 <?php if (empty($historique)): ?>

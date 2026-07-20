@@ -2,13 +2,15 @@
 
 <!-- Navbar Client -->
 <nav class="navbar navbar-expand-lg navbar-light navbar-orange">
-    <div class="container">
-        <a class="navbar-brand navbar-brand-text" href="/client">
-            <div class="brand-circle">O</div>
-            Orange Money
-        </a>
-        <span class="badge bg-orange-light text-orange border">Espace Client</span>
-    </div>
+<div class="container d-flex justify-content-between align-items-center">
+    <a class="navbar-brand navbar-brand-text" href="/client">
+        <img src="<?= base_url('img/logo.png') ?>" alt="Orange Money" class="brand-logo">
+        <span>Orange Money</span>
+    </a>
+    <span class="badge bg-orange-light text-orange border">
+        Espace Client
+    </span>
+</div>
 </nav>
 
 <main class="container mt-5">
@@ -55,11 +57,11 @@
                 </div>
             </div>
 
-            <div class="text-center mt-4">
-                <a href="/operateur" class="text-muted text-decoration-none">
-                    <i class="bi bi-shield-lock me-1"></i> Accès espace opérateur
-                </a>
-            </div>
+        <div class="d-flex align-items-center">
+            <a href="/operateur" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-person-circle me-1"></i>Espace opérateur
+            </a>
+        </div>
         </div>
     </div>
 </main>

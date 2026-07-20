@@ -11,6 +11,9 @@ use App\Models\ConfigurationModel;
 
 class OperateurController extends BaseController
 {
+    private const OPERATEUR_IDENTIFIANT = 'operateur';
+    private const OPERATEUR_MOT_DE_PASSE = '4021';
+
     protected CompteModel        $compteModel;
     protected TransactionModel   $transactionModel;
     protected TypeOperationModel $typeModel;
@@ -28,8 +31,28 @@ class OperateurController extends BaseController
         $this->configModel      = new ConfigurationModel();
     }
 
-    public function index(): string
+    private function operateurEstConnecte(): bool
     {
+        return (bool) session()->get('operateur_connecte');
+    }
+
+    private function redirigerSiNonConnecte(): ?\CodeIgniter\HTTP\RedirectResponse
+    {
+        if (! $this->operateurEstConnecte()) {
+            return redirect()->to('/operateur');
+        }
+
+        return null;
+    }
+
+    public function index(): string|\CodeIgniter\HTTP\RedirectResponse
+    {
+        if (! $this->operateurEstConnecte()) {
+            return view('operateur/login', [
+                'titre' => 'Orange Money - Connexion opérateur',
+            ]);
+        }
+
         $gains         = $this->transactionModel->getGainOperateur();
         $totalGain     = $this->transactionModel->getTotalGainOperateur();
         $comptes       = $this->compteModel->getComptesAvecStats();
@@ -48,8 +71,40 @@ class OperateurController extends BaseController
         ]);
     }
 
-    public function gererPrefixes(): string
+    public function login(): \CodeIgniter\HTTP\RedirectResponse
     {
+        $identifiant = trim((string) $this->request->getPost('identifiant'));
+        $motDePasse   = (string) $this->request->getPost('mot_de_passe');
+
+        if ($identifiant === '' || $motDePasse === '') {
+            return redirect()->to('/operateur')->with('erreur', 'Veuillez saisir l’identifiant et le mot de passe.');
+        }
+
+        if ($identifiant !== self::OPERATEUR_IDENTIFIANT || $motDePasse !== self::OPERATEUR_MOT_DE_PASSE) {
+            return redirect()->to('/operateur')->with('erreur', 'Identifiants opérateur invalides.');
+        }
+
+        session()->set([
+            'operateur_connecte' => true,
+            'operateur_identifiant' => $identifiant,
+        ]);
+
+        return redirect()->to('/operateur')->with('success', 'Connexion opérateur réussie.');
+    }
+
+    public function deconnexion(): \CodeIgniter\HTTP\RedirectResponse
+    {
+        session()->remove(['operateur_connecte', 'operateur_identifiant']);
+
+        return redirect()->to('/operateur')->with('success', 'Vous avez été déconnecté avec succès.');
+    }
+
+    public function gererPrefixes(): string|\CodeIgniter\HTTP\RedirectResponse
+    {
+        if ($redirect = $this->redirigerSiNonConnecte()) {
+            return $redirect;
+        }
+
         $prefixes = $this->prefixeModel->findAll();
 
         return view('operateur/prefixes', [
@@ -60,6 +115,10 @@ class OperateurController extends BaseController
 
     public function ajouterPrefixe(): \CodeIgniter\HTTP\RedirectResponse
     {
+        if ($redirect = $this->redirigerSiNonConnecte()) {
+            return $redirect;
+        }
+
         $prefixe           = trim($this->request->getPost('prefixe'));
         $description       = trim($this->request->getPost('description'));
         $estAutreOperateur = $this->request->getPost('est_autre_operateur') ? 1 : 0;
@@ -85,12 +144,20 @@ class OperateurController extends BaseController
 
     public function supprimerPrefixe(int $id): \CodeIgniter\HTTP\RedirectResponse
     {
+        if ($redirect = $this->redirigerSiNonConnecte()) {
+            return $redirect;
+        }
+
         $this->prefixeModel->delete($id);
         return redirect()->back()->with('success', 'Préfixe supprimé.');
     }
 
     public function togglePrefixe(int $id): \CodeIgniter\HTTP\RedirectResponse
     {
+        if ($redirect = $this->redirigerSiNonConnecte()) {
+            return $redirect;
+        }
+
         $prefixe = $this->prefixeModel->find($id);
         if (!$prefixe) {
             return redirect()->back()->with('erreur', 'Préfixe introuvable.');
@@ -101,8 +168,12 @@ class OperateurController extends BaseController
         return redirect()->back()->with('success', $message);
     }
 
-    public function gererTypesOperations(): string
+    public function gererTypesOperations(): string|\CodeIgniter\HTTP\RedirectResponse
     {
+        if ($redirect = $this->redirigerSiNonConnecte()) {
+            return $redirect;
+        }
+
         $types = $this->typeModel->findAll();
 
         return view('operateur/types_operations', [
@@ -111,8 +182,12 @@ class OperateurController extends BaseController
         ]);
     }
 
-    public function gererBaremes(): string
+    public function gererBaremes(): string|\CodeIgniter\HTTP\RedirectResponse
     {
+        if ($redirect = $this->redirigerSiNonConnecte()) {
+            return $redirect;
+        }
+
         $types   = $this->typeModel->findAll();
         $baremes = $this->baremeModel->getBaremesAvecType();
 
@@ -125,6 +200,10 @@ class OperateurController extends BaseController
 
     public function ajouterBareme(): \CodeIgniter\HTTP\RedirectResponse
     {
+        if ($redirect = $this->redirigerSiNonConnecte()) {
+            return $redirect;
+        }
+
         $typeId    = (int) $this->request->getPost('type_operation_id');
         $montMin   = (float) $this->request->getPost('montant_min');
         $montMax   = (float) $this->request->getPost('montant_max');
@@ -146,12 +225,20 @@ class OperateurController extends BaseController
 
     public function supprimerBareme(int $id): \CodeIgniter\HTTP\RedirectResponse
     {
+        if ($redirect = $this->redirigerSiNonConnecte()) {
+            return $redirect;
+        }
+
         $this->baremeModel->delete($id);
         return redirect()->back()->with('success', 'Barème supprimé.');
     }
 
-    public function gererConfigurations(): string
+    public function gererConfigurations(): string|\CodeIgniter\HTTP\RedirectResponse
     {
+        if ($redirect = $this->redirigerSiNonConnecte()) {
+            return $redirect;
+        }
+
         $commissionExterne = $this->configModel->getValeur('commission_transfert_externe', 0);
 
         return view('operateur/configurations', [
@@ -162,6 +249,10 @@ class OperateurController extends BaseController
 
     public function sauvegarderConfigurations(): \CodeIgniter\HTTP\RedirectResponse
     {
+        if ($redirect = $this->redirigerSiNonConnecte()) {
+            return $redirect;
+        }
+
         $commission = (float) $this->request->getPost('commission_externe');
         
         if ($commission < 0) {
@@ -173,8 +264,12 @@ class OperateurController extends BaseController
         return redirect()->back()->with('success', 'Configurations sauvegardées.');
     }
 
-    public function situationGains(): string
+    public function situationGains(): string|\CodeIgniter\HTTP\RedirectResponse
     {
+        if ($redirect = $this->redirigerSiNonConnecte()) {
+            return $redirect;
+        }
+
         $gains             = $this->transactionModel->getGainOperateur();
         $totalGain         = $this->transactionModel->getTotalGainOperateur();
         $totalCommissionExt= $this->transactionModel->getTotalCommissionAutresOperateurs();
@@ -191,8 +286,12 @@ class OperateurController extends BaseController
         ]);
     }
 
-    public function situationComptes(): string
+    public function situationComptes(): string|\CodeIgniter\HTTP\RedirectResponse
     {
+        if ($redirect = $this->redirigerSiNonConnecte()) {
+            return $redirect;
+        }
+
         $comptes = $this->compteModel->getComptesAvecStats();
 
         return view('operateur/comptes', [
