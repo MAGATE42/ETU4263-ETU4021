@@ -1,0 +1,117 @@
+ERROR - 2026-07-20 09:20:30 --> Unable to prepare statement: no such table: transactions
+in SYSTEMPATH\Database\SQLite3\Connection.php on line 164.
+ 1 SYSTEMPATH\Database\SQLite3\Connection.php(164): SQLite3->query('SELECT `to2`.`code` as `type_code`, `to2`.`libelle` as `type_libelle`, COUNT(t.id) as nb_transactions, SUM(t.montant) as total_montants, SUM(t.frais) as total_frais
+FROM `transactions` `t`
+JOIN `types_operations` `to2` ON `to2`.`id` = `t`.`type_operation_id`
+WHERE `t`.`statut` = \'success\'
+AND `to2`.`code` IN (\'RETRAIT\',\'TRANSFERT\')
+GROUP BY `to2`.`code`')
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\SQLite3\Connection->execute('SELECT `to2`.`code` as `type_code`, `to2`.`libelle` as `type_libelle`, COUNT(t.id) as nb_transactions, SUM(t.montant) as total_montants, SUM(t.frais) as total_frais
+FROM `transactions` `t`
+JOIN `types_operations` `to2` ON `to2`.`id` = `t`.`type_operation_id`
+WHERE `t`.`statut` = \'success\'
+AND `to2`.`code` IN (\'RETRAIT\',\'TRANSFERT\')
+GROUP BY `to2`.`code`')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `to2`.`code` as `type_code`, `to2`.`libelle` as `type_libelle`, COUNT(t.id) as nb_transactions, SUM(t.montant) as total_montants, SUM(t.frais) as total_frais
+FROM `transactions` `t`
+JOIN `types_operations` `to2` ON `to2`.`id` = `t`.`type_operation_id`
+WHERE `t`.`statut` = \'success\'
+AND `to2`.`code` IN (\'RETRAIT\',\'TRANSFERT\')
+GROUP BY `to2`.`code`')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `to2`.`code` as `type_code`, `to2`.`libelle` as `type_libelle`, COUNT(t.id) as nb_transactions, SUM(t.montant) as total_montants, SUM(t.frais) as total_frais
+FROM `transactions` `t`
+JOIN `types_operations` `to2` ON `to2`.`id` = `t`.`type_operation_id`
+WHERE `t`.`statut` = :t.statut:
+AND `to2`.`code` IN :to2.code:
+GROUP BY `to2`.`code`', [...], false)
+ 5 APPPATH\Models\TransactionModel.php(88): CodeIgniter\Database\BaseBuilder->get()
+ 6 APPPATH\Controllers\OperateurController.php(33): App\Models\TransactionModel->getGainOperateur()
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\OperateurController->index()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OperateurController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\Users\\Harinala\\Documents\\operateur\\operateur\\public\\index.php')
+CRITICAL - 2026-07-20 09:20:30 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to prepare statement: no such table: transactions
+[Method: GET, Route: operateur]
+in SYSTEMPATH\Database\BaseConnection.php on line 865.
+ 1 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `to2`.`code` as `type_code`, `to2`.`libelle` as `type_libelle`, COUNT(t.id) as nb_transactions, SUM(t.montant) as total_montants, SUM(t.frais) as total_frais
+FROM `transactions` `t`
+JOIN `types_operations` `to2` ON `to2`.`id` = `t`.`type_operation_id`
+WHERE `t`.`statut` = :t.statut:
+AND `to2`.`code` IN :to2.code:
+GROUP BY `to2`.`code`', [...], false)
+ 2 APPPATH\Models\TransactionModel.php(88): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH\Controllers\OperateurController.php(33): App\Models\TransactionModel->getGainOperateur()
+ 4 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\OperateurController->index()
+ 5 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OperateurController))
+ 6 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 7 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 8 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 9 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+10 SYSTEMPATH\rewrite.php(44): require_once('C:\\Users\\Harinala\\Documents\\operateur\\operateur\\public\\index.php')
+CRITICAL - 2026-07-20 09:20:30 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unable to prepare statement: no such table: transactions
+in SYSTEMPATH\Database\SQLite3\Connection.php on line 174.
+ 1 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\SQLite3\Connection->execute('SELECT `to2`.`code` as `type_code`, `to2`.`libelle` as `type_libelle`, COUNT(t.id) as nb_transactions, SUM(t.montant) as total_montants, SUM(t.frais) as total_frais
+FROM `transactions` `t`
+JOIN `types_operations` `to2` ON `to2`.`id` = `t`.`type_operation_id`
+WHERE `t`.`statut` = \'success\'
+AND `to2`.`code` IN (\'RETRAIT\',\'TRANSFERT\')
+GROUP BY `to2`.`code`')
+ 2 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `to2`.`code` as `type_code`, `to2`.`libelle` as `type_libelle`, COUNT(t.id) as nb_transactions, SUM(t.montant) as total_montants, SUM(t.frais) as total_frais
+FROM `transactions` `t`
+JOIN `types_operations` `to2` ON `to2`.`id` = `t`.`type_operation_id`
+WHERE `t`.`statut` = \'success\'
+AND `to2`.`code` IN (\'RETRAIT\',\'TRANSFERT\')
+GROUP BY `to2`.`code`')
+ 3 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `to2`.`code` as `type_code`, `to2`.`libelle` as `type_libelle`, COUNT(t.id) as nb_transactions, SUM(t.montant) as total_montants, SUM(t.frais) as total_frais
+FROM `transactions` `t`
+JOIN `types_operations` `to2` ON `to2`.`id` = `t`.`type_operation_id`
+WHERE `t`.`statut` = :t.statut:
+AND `to2`.`code` IN :to2.code:
+GROUP BY `to2`.`code`', [...], false)
+ 4 APPPATH\Models\TransactionModel.php(88): CodeIgniter\Database\BaseBuilder->get()
+ 5 APPPATH\Controllers\OperateurController.php(33): App\Models\TransactionModel->getGainOperateur()
+ 6 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\OperateurController->index()
+ 7 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OperateurController))
+ 8 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('C:\\Users\\Harinala\\Documents\\operateur\\operateur\\public\\index.php')
+CRITICAL - 2026-07-20 09:20:30 --> [Caused by] SQLite3Exception: Unable to prepare statement: no such table: transactions
+in SYSTEMPATH\Database\SQLite3\Connection.php on line 164.
+ 1 SYSTEMPATH\Database\SQLite3\Connection.php(164): SQLite3->query('SELECT `to2`.`code` as `type_code`, `to2`.`libelle` as `type_libelle`, COUNT(t.id) as nb_transactions, SUM(t.montant) as total_montants, SUM(t.frais) as total_frais
+FROM `transactions` `t`
+JOIN `types_operations` `to2` ON `to2`.`id` = `t`.`type_operation_id`
+WHERE `t`.`statut` = \'success\'
+AND `to2`.`code` IN (\'RETRAIT\',\'TRANSFERT\')
+GROUP BY `to2`.`code`')
+ 2 SYSTEMPATH\Database\BaseConnection.php(910): CodeIgniter\Database\SQLite3\Connection->execute('SELECT `to2`.`code` as `type_code`, `to2`.`libelle` as `type_libelle`, COUNT(t.id) as nb_transactions, SUM(t.montant) as total_montants, SUM(t.frais) as total_frais
+FROM `transactions` `t`
+JOIN `types_operations` `to2` ON `to2`.`id` = `t`.`type_operation_id`
+WHERE `t`.`statut` = \'success\'
+AND `to2`.`code` IN (\'RETRAIT\',\'TRANSFERT\')
+GROUP BY `to2`.`code`')
+ 3 SYSTEMPATH\Database\BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery('SELECT `to2`.`code` as `type_code`, `to2`.`libelle` as `type_libelle`, COUNT(t.id) as nb_transactions, SUM(t.montant) as total_montants, SUM(t.frais) as total_frais
+FROM `transactions` `t`
+JOIN `types_operations` `to2` ON `to2`.`id` = `t`.`type_operation_id`
+WHERE `t`.`statut` = \'success\'
+AND `to2`.`code` IN (\'RETRAIT\',\'TRANSFERT\')
+GROUP BY `to2`.`code`')
+ 4 SYSTEMPATH\Database\BaseBuilder.php(1649): CodeIgniter\Database\BaseConnection->query('SELECT `to2`.`code` as `type_code`, `to2`.`libelle` as `type_libelle`, COUNT(t.id) as nb_transactions, SUM(t.montant) as total_montants, SUM(t.frais) as total_frais
+FROM `transactions` `t`
+JOIN `types_operations` `to2` ON `to2`.`id` = `t`.`type_operation_id`
+WHERE `t`.`statut` = :t.statut:
+AND `to2`.`code` IN :to2.code:
+GROUP BY `to2`.`code`', [...], false)
+ 5 APPPATH\Models\TransactionModel.php(88): CodeIgniter\Database\BaseBuilder->get()
+ 6 APPPATH\Controllers\OperateurController.php(33): App\Models\TransactionModel->getGainOperateur()
+ 7 SYSTEMPATH\CodeIgniter.php(951): App\Controllers\OperateurController->index()
+ 8 SYSTEMPATH\CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\OperateurController))
+ 9 SYSTEMPATH\CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+10 SYSTEMPATH\Boot.php(417): CodeIgniter\CodeIgniter->run()
+11 SYSTEMPATH\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+12 FCPATH\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+13 SYSTEMPATH\rewrite.php(44): require_once('C:\\Users\\Harinala\\Documents\\operateur\\operateur\\public\\index.php')
