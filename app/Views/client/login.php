@@ -1,9 +1,10 @@
 <?= view('layouts/header', ['titre' => $titre ?? 'Orange Money - Connexion']) ?>
 
+<!-- Navbar Client -->
 <nav class="navbar navbar-expand-lg navbar-light navbar-orange">
     <div class="container">
         <a class="navbar-brand navbar-brand-text" href="/client">
-            <img src="/img/logo.png" alt="Orange Money" class="brand-logo">
+            <div class="brand-circle">O</div>
             Orange Money
         </a>
         <span class="badge bg-orange-light text-orange border">Espace Client</span>
@@ -35,11 +36,23 @@
                     <?= csrf_field() ?>
                     <div class="mb-3">
                         <label for="telephone" class="form-label fw-bold">Numéro de téléphone</label>
-                        <input type="text" name="telephone" id="telephone" class="form-control form-control-lg" placeholder="ex: 0331402571" required>
+                        <input type="text" name="telephone" id="telephone" class="form-control form-control-lg" placeholder="ex: 0334263" required>
                         <div class="form-text">Préfixes acceptés : 032, 033, 037</div>
                     </div>
                     <button type="submit" class="btn btn-orange btn-lg w-100">Accéder à mon compte</button>
                 </form>
+            </div>
+
+            <div class="card p-3 mt-4">
+                <h6 class="text-muted text-uppercase fw-bold mb-3">Comptes de démonstration</h6>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-outline-secondary text-start" onclick="document.getElementById('telephone').value='0334263'">
+                        Personne 1 : <strong>0334263</strong> (Jean RAKOTO)
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary text-start" onclick="document.getElementById('telephone').value='0334021'">
+                        Personne 2 : <strong>0334021</strong> (Marie RABE)
+                    </button>
+                </div>
             </div>
 
             <div class="text-center mt-4">

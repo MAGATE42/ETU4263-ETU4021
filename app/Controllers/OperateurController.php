@@ -7,10 +7,8 @@ use App\Models\TransactionModel;
 use App\Models\TypeOperationModel;
 use App\Models\BaremeFraisModel;
 use App\Models\PrefixeModel;
+use App\Models\ConfigurationModel;
 
-/**
- * OperateurController : Gère le côté OPÉRATEUR du système mobile money Orange
- */
 class OperateurController extends BaseController
 {
     protected CompteModel        $compteModel;
@@ -18,6 +16,7 @@ class OperateurController extends BaseController
     protected TypeOperationModel $typeModel;
     protected BaremeFraisModel   $baremeModel;
     protected PrefixeModel       $prefixeModel;
+    protected ConfigurationModel $configModel;
 
     public function __construct()
     {
@@ -26,6 +25,7 @@ class OperateurController extends BaseController
         $this->typeModel        = new TypeOperationModel();
         $this->baremeModel      = new BaremeFraisModel();
         $this->prefixeModel     = new PrefixeModel();
+        $this->configModel      = new ConfigurationModel();
     }
 
     public function index(): string
@@ -60,8 +60,9 @@ class OperateurController extends BaseController
 
     public function ajouterPrefixe(): \CodeIgniter\HTTP\RedirectResponse
     {
-        $prefixe     = trim($this->request->getPost('prefixe'));
-        $description = trim($this->request->getPost('description'));
+        $prefixe           = trim($this->request->getPost('prefixe'));
+        $description       = trim($this->request->getPost('description'));
+        $estAutreOperateur = $this->request->getPost('est_autre_operateur') ? 1 : 0;
 
         if (empty($prefixe)) {
             return redirect()->back()->with('erreur', 'Le préfixe est obligatoire.');
@@ -73,9 +74,10 @@ class OperateurController extends BaseController
         }
 
         $this->prefixeModel->insert([
-            'prefixe'     => $prefixe,
-            'description' => $description,
-            'actif'       => 1,
+            'prefixe'             => $prefixe,
+            'description'         => $description,
+            'actif'               => 1,
+            'est_autre_operateur' => $estAutreOperateur,
         ]);
 
         return redirect()->back()->with('success', 'Préfixe ajouté avec succès.');
@@ -148,17 +150,44 @@ class OperateurController extends BaseController
         return redirect()->back()->with('success', 'Barème supprimé.');
     }
 
+    public function gererConfigurations(): string
+    {
+        $commissionExterne = $this->configModel->getValeur('commission_transfert_externe', 0);
+
+        return view('operateur/configurations', [
+            'titre'              => 'Configurations Globales',
+            'commission_externe' => $commissionExterne,
+        ]);
+    }
+
+    public function sauvegarderConfigurations(): \CodeIgniter\HTTP\RedirectResponse
+    {
+        $commission = (float) $this->request->getPost('commission_externe');
+        
+        if ($commission < 0) {
+            return redirect()->back()->with('erreur', 'La commission ne peut pas être négative.');
+        }
+
+        $this->configModel->setValeur('commission_transfert_externe', (string) $commission);
+
+        return redirect()->back()->with('success', 'Configurations sauvegardées.');
+    }
+
     public function situationGains(): string
     {
-        $gains         = $this->transactionModel->getGainOperateur();
-        $totalGain     = $this->transactionModel->getTotalGainOperateur();
-        $transactions  = $this->transactionModel->getToutesTransactionsAvecDetails(200);
+        $gains             = $this->transactionModel->getGainOperateur();
+        $totalGain         = $this->transactionModel->getTotalGainOperateur();
+        $totalCommissionExt= $this->transactionModel->getTotalCommissionAutresOperateurs();
+        $dusAutresOps      = $this->transactionModel->getMontantsDusAutresOperateurs();
+        $transactions      = $this->transactionModel->getToutesTransactionsAvecDetails(200);
 
         return view('operateur/gains', [
-            'titre'      => 'Situation des Gains - Opérateur Orange',
-            'gains'      => $gains,
-            'total_gain' => $totalGain,
-            'transactions'=> $transactions,
+            'titre'                => 'Situation des Gains - Opérateur',
+            'gains'                => $gains,
+            'total_gain'           => $totalGain,
+            'total_commission_ext' => $totalCommissionExt,
+            'dus_autres_ops'       => $dusAutresOps,
+            'transactions'         => $transactions,
         ]);
     }
 

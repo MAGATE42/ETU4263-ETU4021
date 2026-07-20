@@ -14,14 +14,15 @@ class PrefixeModel extends Model
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
-    protected $allowedFields    = ['prefixe', 'description', 'actif'];
+    protected $allowedFields    = ['prefixe', 'description', 'actif', 'est_autre_operateur'];
     protected $useTimestamps    = true;
 
     // ─── Validation ──────────────────────────────────────────────────
     protected $validationRules = [
         'prefixe'     => 'required|min_length[2]|max_length[10]',
-        'description' => 'permit_empty|max_length[100]',
-        'actif'       => 'permit_empty|in_list[0,1]',
+        'description'         => 'permit_empty|max_length[100]',
+        'actif'               => 'permit_empty|in_list[0,1]',
+        'est_autre_operateur' => 'permit_empty|in_list[0,1]',
     ];
 
     protected $validationMessages = [
@@ -51,5 +52,19 @@ class PrefixeModel extends Model
             }
         }
         return false;
+    }
+
+    /**
+     * Retourne les détails du préfixe correspondant au numéro, ou null si invalide
+     */
+    public function getDetailsPrefixe(string $telephone): ?array
+    {
+        $prefixes = $this->getPrefixesActifs();
+        foreach ($prefixes as $p) {
+            if (str_starts_with($telephone, $p['prefixe'])) {
+                return $p;
+            }
+        }
+        return null;
     }
 }

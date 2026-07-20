@@ -7,6 +7,7 @@ use App\Models\TransactionModel;
 use App\Models\TypeOperationModel;
 use App\Models\BaremeFraisModel;
 use App\Models\PrefixeModel;
+use App\Models\ConfigurationModel;
 
 /**
  * UtilisateurController : Gère le côté CLIENT du système mobile money Orange
@@ -18,6 +19,7 @@ class UtilisateurController extends BaseController
     protected TypeOperationModel $typeModel;
     protected BaremeFraisModel  $baremeModel;
     protected PrefixeModel      $prefixeModel;
+    protected ConfigurationModel $configModel;
 
     public function __construct()
     {
@@ -26,6 +28,7 @@ class UtilisateurController extends BaseController
         $this->typeModel        = new TypeOperationModel();
         $this->baremeModel      = new BaremeFraisModel();
         $this->prefixeModel     = new PrefixeModel();
+        $this->configModel      = new ConfigurationModel();
     }
 
     public function index(): string
@@ -44,7 +47,13 @@ class UtilisateurController extends BaseController
         }
 
         if (!$this->prefixeModel->estPrefixeValide($telephone)) {
-            return redirect()->to('/client')->with('erreur', 'Ce numéro ne correspond pas à un préfixe Orange valide (032, 033, 037).');
+            return redirect()->to('/client')->with('erreur', 'Ce numéro ne correspond à aucun préfixe valide.');
+        }
+
+        // Bloquer les numéros appartenant à un autre opérateur
+        $prefixeDetails = $this->prefixeModel->getDetailsPrefixe($telephone);
+        if ($prefixeDetails && $prefixeDetails['est_autre_operateur'] == 1) {
+            return redirect()->to('/client')->with('erreur', 'Les numéros d\'autres opérateurs ne peuvent pas se connecter sur cette plateforme.');
         }
 
         $compte = $this->compteModel->getParTelephone($telephone);
@@ -83,11 +92,13 @@ class UtilisateurController extends BaseController
         $compteId = session()->get('client_id');
         $compte   = $this->compteModel->find($compteId);
         $historique = $this->transactionModel->getHistoriqueCompte($compteId, 5);
+        $prefixes = $this->prefixeModel->findAll();
 
         return view('client/dashboard', [
             'titre'     => 'Orange Money - Mon Compte',
             'compte'    => $compte,
             'historique'=> $historique,
+            'prefixes'  => $prefixes,
         ]);
     }
 
@@ -172,80 +183,164 @@ class UtilisateurController extends BaseController
             return redirect()->to('/client');
         }
 
-        $montant      = (float) $this->request->getPost('montant');
-        $telDest      = trim($this->request->getPost('telephone_destinataire'));
+        $montantTotal = (float) $this->request->getPost('montant');
+        $telDestInput = $this->request->getPost('telephone_destinataire');
+        $inclureRetrait= $this->request->getPost('inclure_frais_retrait') ? true : false;
+        
         $compteId     = session()->get('client_id');
-        $telExpéditeur = session()->get('client_telephone');
+        $telExpediteur= session()->get('client_telephone');
 
-        if ($montant <= 0) {
+        if ($montantTotal <= 0) {
             return redirect()->back()->with('erreur', 'Le montant doit être supérieur à 0.');
         }
 
-        if (empty($telDest)) {
-            return redirect()->back()->with('erreur', 'Veuillez saisir le numéro du destinataire.');
+        if (empty($telDestInput)) {
+            return redirect()->back()->with('erreur', 'Veuillez saisir au moins un numéro de destinataire.');
         }
 
-        if ($telDest === $telExpéditeur) {
-            return redirect()->back()->with('erreur', 'Vous ne pouvez pas vous envoyer un transfert à vous-même.');
+        // Nettoyage et séparation des numéros
+        if (is_array($telDestInput)) {
+            $destinataires = array_filter(array_map('trim', $telDestInput));
+        } else {
+            $destinataires = array_filter(array_map('trim', explode(',', trim($telDestInput))));
         }
 
-        if (!$this->prefixeModel->estPrefixeValide($telDest)) {
-            return redirect()->back()->with('erreur', 'Le numéro du destinataire n\'est pas un numéro Orange valide.');
+        if (empty($destinataires)) {
+            return redirect()->back()->with('erreur', 'Format de destinataires invalide.');
         }
 
-        $compteDest = $this->compteModel->getParTelephone($telDest);
-        if (!$compteDest) {
-            $idDest     = $this->compteModel->insert([
-                'telephone' => $telDest,
-                'nom'       => 'Client',
-                'prenom'    => '',
-                'solde'     => 0.00,
-                'statut'    => 'actif',
-            ]);
-            $compteDest = $this->compteModel->find($idDest);
-        }
+        $isMultiple = count($destinataires) > 1;
 
         $typeTransfert = $this->typeModel->getParCode('TRANSFERT');
-        if (!$typeTransfert) {
-            return redirect()->back()->with('erreur', 'Type d\'opération introuvable.');
+        $typeDepot     = $this->typeModel->getParCode('DEPOT');
+        $typeRetrait   = $this->typeModel->getParCode('RETRAIT');
+
+        if (!$typeTransfert || !$typeDepot || !$typeRetrait) {
+            return redirect()->back()->with('erreur', 'Configuration des types d\'opération manquante.');
         }
 
-        $frais      = $this->baremeModel->calculerFrais($typeTransfert['id'], $montant);
+        // Validation des destinataires
+        $comptesDests = [];
+        foreach ($destinataires as $telDest) {
+            if ($telDest === $telExpediteur) {
+                return redirect()->back()->with('erreur', 'Vous ne pouvez pas vous envoyer un transfert à vous-même.');
+            }
+
+            $prefixeDetails = $this->prefixeModel->getDetailsPrefixe($telDest);
+            if (!$prefixeDetails) {
+                return redirect()->back()->with('erreur', "Le numéro $telDest n'est pas valide.");
+            }
+
+            if ($isMultiple && $prefixeDetails['est_autre_operateur'] == 1) {
+                return redirect()->back()->with('erreur', "L'envoi multiple n'est possible que vers des numéros du même opérateur (interne).");
+            }
+
+            $comptesDests[] = [
+                'telephone' => $telDest,
+                'prefixe'   => $prefixeDetails
+            ];
+        }
+
+        $montantUnitaire = round($montantTotal / count($comptesDests), 2);
+        $totalDebitGlobal = 0;
+        $operationsLog = [];
+        
+        $commissionPourcentage = (float) $this->configModel->getValeur('commission_transfert_externe', 0);
+
+        // Simulation pour calculer le débit global
+        foreach ($comptesDests as &$dest) {
+            $montantAEnvoyer = $montantUnitaire;
+            $fraisRetrait    = 0;
+            $commissionExt   = 0;
+
+            if ($dest['prefixe']['est_autre_operateur'] == 1) {
+                // Commission externe (pourcentage)
+                $commissionExt = round(($montantAEnvoyer * $commissionPourcentage) / 100, 2);
+            } else {
+                if ($inclureRetrait) {
+                    $fraisRetrait = $this->baremeModel->calculerFrais($typeRetrait['id'], $montantAEnvoyer);
+                    $montantAEnvoyer += $fraisRetrait; // On envoie le montant + les frais pour que le retrait soit "gratuit" pour le destinataire
+                }
+            }
+
+            $fraisTransfert = $this->baremeModel->calculerFrais($typeTransfert['id'], $montantAEnvoyer);
+            $totalDebit = $montantAEnvoyer + $fraisTransfert + $commissionExt;
+            $totalDebitGlobal += $totalDebit;
+
+            $dest['montant_a_envoyer'] = $montantAEnvoyer;
+            $dest['frais_transfert']   = $fraisTransfert;
+            $dest['commission_ext']    = $commissionExt;
+            $dest['total_debit']       = $totalDebit;
+        }
+
+        // Vérification du solde global
         $compteEmetteur = $this->compteModel->find($compteId);
-        $totalDebit = $montant + $frais;
-
-        if ($compteEmetteur['solde'] < $totalDebit) {
-            return redirect()->back()->with('erreur', 'Solde insuffisant. Solde : ' . number_format($compteEmetteur['solde'], 0, ',', ' ') . ' Ar | Requis : ' . number_format($totalDebit, 0, ',', ' ') . ' Ar (frais : ' . number_format($frais, 0, ',', ' ') . ' Ar)');
+        if ($compteEmetteur['solde'] < $totalDebitGlobal) {
+            return redirect()->back()->with('erreur', 'Solde insuffisant pour le total de l\'opération. Solde : ' . number_format($compteEmetteur['solde'], 0, ',', ' ') . ' Ar | Requis : ' . number_format($totalDebitGlobal, 0, ',', ' ') . ' Ar');
         }
 
-        $this->compteModel->debiter($compteId, $totalDebit);
-        $this->compteModel->crediter($compteDest['id'], $montant);
+        // Exécution des transactions
+        $db = \Config\Database::connect();
+        $db->transStart();
 
-        $ref = $this->transactionModel->genererReference();
-        $this->transactionModel->insert([
-            'reference'              => $ref,
-            'compte_id'              => $compteId,
-            'type_operation_id'      => $typeTransfert['id'],
-            'montant'                => $montant,
-            'frais'                  => $frais,
-            'compte_destinataire_id' => $compteDest['id'],
-            'statut'                 => 'success',
-            'note'                   => 'Transfert vers ' . $telDest,
-        ]);
+        $this->compteModel->debiter($compteId, $totalDebitGlobal);
 
-        $typeDepot = $this->typeModel->getParCode('DEPOT');
-        $this->transactionModel->insert([
-            'reference'              => 'REC-' . substr($ref, 4),
-            'compte_id'              => $compteDest['id'],
-            'type_operation_id'      => $typeDepot['id'],
-            'montant'                => $montant,
-            'frais'                  => 0,
-            'compte_destinataire_id' => null,
-            'statut'                 => 'success',
-            'note'                   => 'Reçu de ' . $telExpéditeur,
-        ]);
+        foreach ($comptesDests as $dest) {
+            $compteDestRow = $this->compteModel->getParTelephone($dest['telephone']);
+            if (!$compteDestRow) {
+                $idDest = $this->compteModel->insert([
+                    'telephone' => $dest['telephone'],
+                    'nom'       => 'Client',
+                    'prenom'    => '',
+                    'solde'     => 0.00,
+                    'statut'    => 'actif',
+                ]);
+                $compteDestRow = $this->compteModel->find($idDest);
+            }
 
-        return redirect()->back()->with('success', 'Transfert de ' . number_format($montant, 0, ',', ' ') . ' Ar vers ' . $telDest . ' effectué avec succès.');
+            $this->compteModel->crediter($compteDestRow['id'], $dest['montant_a_envoyer']);
+
+            $ref = $this->transactionModel->genererReference();
+            $noteAdd = $inclureRetrait && !$dest['prefixe']['est_autre_operateur'] ? " (Frais de retrait inclus)" : "";
+            
+            // Transaction Emetteur
+            $this->transactionModel->insert([
+                'reference'              => $ref,
+                'compte_id'              => $compteId,
+                'type_operation_id'      => $typeTransfert['id'],
+                'montant'                => $dest['montant_a_envoyer'], // Montant réellement transféré
+                'frais'                  => $dest['frais_transfert'],
+                'commission_autre_operateur' => $dest['commission_ext'],
+                'compte_destinataire_id' => $compteDestRow['id'],
+                'statut'                 => 'success',
+                'note'                   => 'Transfert vers ' . $dest['telephone'] . $noteAdd,
+            ]);
+
+            // Transaction Destinataire
+            $this->transactionModel->insert([
+                'reference'              => 'REC-' . substr($ref, 4),
+                'compte_id'              => $compteDestRow['id'],
+                'type_operation_id'      => $typeDepot['id'],
+                'montant'                => $dest['montant_a_envoyer'],
+                'frais'                  => 0,
+                'commission_autre_operateur' => 0,
+                'compte_destinataire_id' => null, // Optionnel, on pourrait mettre l'émetteur
+                'statut'                 => 'success',
+                'note'                   => 'Reçu de ' . $telExpediteur,
+            ]);
+        }
+
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return redirect()->back()->with('erreur', 'Erreur lors de l\'exécution du transfert. Veuillez réessayer.');
+        }
+
+        if ($isMultiple) {
+            return redirect()->back()->with('success', 'Transferts groupés effectués avec succès pour un total de ' . number_format($totalDebitGlobal, 0, ',', ' ') . ' Ar débités.');
+        }
+
+        return redirect()->back()->with('success', 'Transfert effectué avec succès vers ' . $comptesDests[0]['telephone'] . ' (Débité : ' . number_format($totalDebitGlobal, 0, ',', ' ') . ' Ar).');
     }
 
     public function voirHistoriques(): string|\CodeIgniter\HTTP\RedirectResponse

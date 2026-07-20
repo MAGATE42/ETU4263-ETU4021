@@ -63,7 +63,7 @@ $actifs            = count(array_filter($comptes, fn($c) => $c['statut'] === 'ac
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
         <h5 class="mb-0 fw-bold"><i class="bi bi-list-ul text-orange me-2"></i>Liste des comptes</h5>
         
-                <div class="input-group" style="width: 250px;">
+        <div class="input-group" style="width: 250px;">
             <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
             <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Rechercher...">
         </div>

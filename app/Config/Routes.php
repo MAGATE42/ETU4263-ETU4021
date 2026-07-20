@@ -6,12 +6,9 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-// ── Page d'accueil ──────────────────────────────────────────────────
 $routes->get('/', 'Home::index');
 
-// ════════════════════════════════════════════════════════════════════
-// CÔTÉ CLIENT – UtilisateurController
-// ════════════════════════════════════════════════════════════════════
+
 $routes->group('client', function ($routes) {
     $routes->get('/',                     'UtilisateurController::index');
     $routes->post('login',                'UtilisateurController::verifierUtilisateur');
@@ -23,9 +20,7 @@ $routes->group('client', function ($routes) {
     $routes->get('deconnexion',           'UtilisateurController::deconnexion');
 });
 
-// ════════════════════════════════════════════════════════════════════
-// CÔTÉ OPÉRATEUR – OperateurController
-// ════════════════════════════════════════════════════════════════════
+
 $routes->group('operateur', function ($routes) {
     $routes->get('/',                     'OperateurController::index');
     $routes->get('prefixes',              'OperateurController::gererPrefixes');
@@ -41,4 +36,7 @@ $routes->group('operateur', function ($routes) {
 
     $routes->get('gains',                 'OperateurController::situationGains');
     $routes->get('comptes',               'OperateurController::situationComptes');
+
+    $routes->get('configurations',            'OperateurController::gererConfigurations');
+    $routes->post('configurations/sauvegarder','OperateurController::sauvegarderConfigurations');
 });

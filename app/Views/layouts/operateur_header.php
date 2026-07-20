@@ -6,10 +6,11 @@ function isActive(string $path): string {
 ?>
 <?= view('layouts/header', ['titre' => $titre ?? 'Orange Money - Opérateur']) ?>
 
+<!-- Navbar Opérateur -->
 <nav class="navbar navbar-expand-lg navbar-light navbar-orange">
     <div class="container-fluid">
         <a class="navbar-brand navbar-brand-text" href="/operateur">
-            <img src="/img/logo.png" alt="Orange Money" class="brand-logo">
+            <div class="brand-circle">O</div>
             Orange Money <small class="text-muted" style="font-size: 0.8rem;">Espace Opérateur</small>
         </a>
         <div class="d-flex align-items-center">
@@ -22,6 +23,7 @@ function isActive(string $path): string {
 
 <div class="container-fluid">
     <div class="row">
+        <!-- Sidebar -->
         <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
             <div class="position-sticky">
                 <div class="sidebar-section">Navigation</div>
@@ -39,6 +41,9 @@ function isActive(string $path): string {
                 <a href="/operateur/baremes" class="sidebar-link <?= isActive('baremes') ? 'active' : '' ?>">
                     <i class="bi bi-table me-2"></i> Barèmes de frais
                 </a>
+                <a href="/operateur/configurations" class="sidebar-link <?= isActive('configurations') ? 'active' : '' ?>">
+                    <i class="bi bi-sliders me-2"></i> Configurations
+                </a>
 
                 <div class="sidebar-section mt-3">Rapports</div>
                 <a href="/operateur/gains" class="sidebar-link <?= isActive('gains') ? 'active' : '' ?>">
@@ -50,15 +55,16 @@ function isActive(string $path): string {
             </div>
         </nav>
 
+        <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-
+            
             <?php if (session()->getFlashdata('success')): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="bi bi-check-circle me-2"></i><?= esc(session()->getFlashdata('success')) ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             <?php endif; ?>
-
+            
             <?php if (session()->getFlashdata('erreur')): ?>
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="bi bi-exclamation-triangle me-2"></i><?= esc(session()->getFlashdata('erreur')) ?>

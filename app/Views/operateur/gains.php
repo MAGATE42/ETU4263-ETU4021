@@ -16,35 +16,62 @@ foreach ($gains as $g) {
 
 <div class="row g-4 mb-5">
     <div class="col-md-4">
-        <div class="card shadow-sm text-center h-100">
-            <div class="card-body py-4">
-                <i class="bi bi-currency-exchange text-warning mb-3 d-block" style="font-size: 2.5rem;"></i>
-                <h6 class="text-muted text-uppercase fw-bold">Gain Total</h6>
-                <h2 class="text-warning fw-bold mb-0"><?= number_format($total_gain, 0, ',', ' ') ?> Ar</h2>
+        <div class="card shadow-sm text-center h-100 border-start border-warning border-4">
+            <div class="card-body py-3">
+                <i class="bi bi-currency-exchange text-warning mb-2 d-block" style="font-size: 2rem;"></i>
+                <h6 class="text-muted text-uppercase fw-bold" style="font-size: 0.8rem;">Gains Opérateur (Interne)</h6>
+                <h3 class="text-warning fw-bold mb-0"><?= number_format($total_gain, 0, ',', ' ') ?> Ar</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm text-center h-100">
-            <div class="card-body py-4">
-                <i class="bi bi-arrow-up-circle text-danger mb-3 d-block" style="font-size: 2.5rem;"></i>
-                <h6 class="text-muted text-uppercase fw-bold">Gains Retraits</h6>
-                <h2 class="text-danger fw-bold mb-1"><?= number_format($gainRetrait, 0, ',', ' ') ?> Ar</h2>
+    <div class="col-md-3">
+        <div class="card shadow-sm text-center h-100 border-start border-info border-4">
+            <div class="card-body py-3">
+                <i class="bi bi-globe text-info mb-2 d-block" style="font-size: 2rem;"></i>
+                <h6 class="text-muted text-uppercase fw-bold" style="font-size: 0.8rem;">Commissions (Externes)</h6>
+                <h3 class="text-info fw-bold mb-1"><?= number_format($total_commission_ext, 0, ',', ' ') ?> Ar</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm text-center h-100 border-start border-danger border-4">
+            <div class="card-body py-3">
+                <i class="bi bi-arrow-up-circle text-danger mb-2 d-block" style="font-size: 2rem;"></i>
+                <h6 class="text-muted text-uppercase fw-bold" style="font-size: 0.8rem;">Gains Retraits</h6>
+                <h3 class="text-danger fw-bold mb-1"><?= number_format($gainRetrait, 0, ',', ' ') ?> Ar</h3>
                 <small class="text-muted"><?= $nbRetrait ?> opérations</small>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm text-center h-100">
-            <div class="card-body py-4">
-                <i class="bi bi-send text-orange mb-3 d-block" style="font-size: 2.5rem;"></i>
-                <h6 class="text-muted text-uppercase fw-bold">Gains Transferts</h6>
-                <h2 class="text-orange fw-bold mb-1"><?= number_format($gainTransfert, 0, ',', ' ') ?> Ar</h2>
+    <div class="col-md-3">
+        <div class="card shadow-sm text-center h-100 border-start border-orange border-4">
+            <div class="card-body py-3">
+                <i class="bi bi-send text-orange mb-2 d-block" style="font-size: 2rem;"></i>
+                <h6 class="text-muted text-uppercase fw-bold" style="font-size: 0.8rem;">Gains Transferts</h6>
+                <h3 class="text-orange fw-bold mb-1"><?= number_format($gainTransfert, 0, ',', ' ') ?> Ar</h3>
                 <small class="text-muted"><?= $nbTransfert ?> opérations</small>
             </div>
         </div>
     </div>
 </div>
+
+<?php if (!empty($dus_autres_ops)): ?>
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="alert alert-info shadow-sm d-flex align-items-center" role="alert">
+            <i class="bi bi-info-circle-fill fs-3 me-3"></i>
+            <div>
+                <h5 class="alert-heading fw-bold mb-1">Situation des montants à envoyer (Autres Opérateurs)</h5>
+                <ul class="mb-0 ps-3">
+                    <?php foreach ($dus_autres_ops as $du): ?>
+                        <li>Vous devez <strong><?= number_format($du['total_du'], 0, ',', ' ') ?> Ar</strong> à l'opérateur <strong><?= esc($du['operateur_nom']) ?> (<?= esc($du['prefixe']) ?>)</strong>.</li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-white py-3">
@@ -98,6 +125,13 @@ foreach ($gains as $g) {
                                     <span class="badge bg-warning text-dark fw-bold px-2 py-1">
                                         +<?= number_format($t['frais'], 0, ',', ' ') ?> Ar
                                     </span>
+                                    <?php if ($t['commission_autre_operateur'] > 0): ?>
+                                    <div class="mt-1">
+                                        <span class="badge bg-info text-dark px-1 py-1" title="Commission Externe" style="font-size: 0.7rem;">
+                                            +<?= number_format($t['commission_autre_operateur'], 0, ',', ' ') ?> Ar (Ext)
+                                        </span>
+                                    </div>
+                                    <?php endif; ?>
                                 </td>
                                 <td class="small text-muted text-nowrap">
                                     <?= date('d/m/Y H:i', strtotime($t['created_at'])) ?>

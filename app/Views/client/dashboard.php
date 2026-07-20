@@ -1,9 +1,10 @@
 <?= view('layouts/header', ['titre' => $titre ?? 'Mon Compte - Orange Money']) ?>
 
+<!-- Navbar Client -->
 <nav class="navbar navbar-expand-lg navbar-light navbar-orange mb-4">
     <div class="container">
         <a class="navbar-brand navbar-brand-text" href="/client/dashboard">
-            <img src="/img/logo.png" alt="Orange Money" class="brand-logo">
+            <div class="brand-circle">O</div>
             Orange Money
         </a>
         <div class="d-flex align-items-center gap-3">
@@ -30,7 +31,8 @@
         </div>
     <?php endif; ?>
 
-        <div class="row mb-4">
+    <!-- Solde -->
+    <div class="row mb-4">
         <div class="col-12">
             <div class="card p-4 shadow-sm border-0" style="background-color: var(--orange-light);">
                 <div class="d-flex justify-content-between align-items-center">
@@ -51,7 +53,8 @@
     </div>
 
     <div class="row g-4">
-                <div class="col-md-7">
+        <!-- Colonne Actions (Formulaires) -->
+        <div class="col-md-7">
             
             <div class="card p-4">
                 <h5 class="fw-bold mb-3"><i class="bi bi-arrow-down-circle text-success me-2"></i>Faire un dépôt</h5>
@@ -81,13 +84,24 @@
                 <h5 class="fw-bold mb-3"><i class="bi bi-send text-orange me-2"></i>Faire un transfert</h5>
                 <form action="/client/transfert" method="POST">
                     <?= csrf_field() ?>
-                    <div class="row g-2 mb-3">
-                        <div class="col-sm-6">
-                            <input type="text" name="telephone_destinataire" class="form-control" placeholder="N° destinataire" required>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Numéro(s) destinataire(s)</label>
+                        <div id="destinatairesContainer">
+                            <div class="input-group mb-2 dest-row">
+                                <input type="text" name="telephone_destinataire[]" class="form-control tel-input" placeholder="N° destinataire" required>
+                                <button type="button" class="btn btn-outline-danger btn-remove-dest d-none"><i class="bi bi-trash"></i></button>
+                            </div>
                         </div>
-                        <div class="col-sm-6">
-                            <input type="number" name="montant" class="form-control" placeholder="Montant (Ar)" min="100" required>
-                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAddDest">+ Ajouter un numéro</button>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Montant Total (Ar)</label>
+                        <input type="number" name="montant" class="form-control" placeholder="Montant à diviser (Ar)" min="100" required>
+                    </div>
+                    <div class="mb-3 form-check" id="containerFraisRetrait">
+                        <input type="checkbox" name="inclure_frais_retrait" value="1" class="form-check-input" id="checkFraisRetrait">
+                        <label class="form-check-label small" for="checkFraisRetrait">Inclure les frais de retrait pour le destinataire</label>
+                        <div id="infoFrais" class="form-text text-info d-none">Non applicable pour les autres opérateurs.</div>
                     </div>
                     <button class="btn btn-orange w-100" type="submit">Transférer l'argent</button>
                     <small class="text-muted d-block mt-2 text-center">Frais à la charge de l'expéditeur.</small>
@@ -96,7 +110,8 @@
 
         </div>
 
-                <div class="col-md-5">
+        <!-- Colonne Historique récent -->
+        <div class="col-md-5">
             <div class="card p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-bold mb-0">Dernières opérations</h5>
@@ -150,5 +165,73 @@
         </div>
     </div>
 </main>
+
+<script>
+    const prefixesStr = '<?= json_encode($prefixes) ?>';
+    const prefixes = JSON.parse(prefixesStr);
+
+    const container = document.getElementById('destinatairesContainer');
+    const btnAdd = document.getElementById('btnAddDest');
+    const checkFrais = document.getElementById('checkFraisRetrait');
+    const infoFrais = document.getElementById('infoFrais');
+
+    function checkOperators() {
+        let hasOtherOperator = false;
+        const inputs = document.querySelectorAll('.tel-input');
+        
+        inputs.forEach(input => {
+            let val = input.value.trim();
+            if (val.length > 0) {
+                let prefixObj = prefixes.find(p => val.startsWith(p.prefixe));
+                if (prefixObj && prefixObj.est_autre_operateur == 1) {
+                    hasOtherOperator = true;
+                }
+            }
+        });
+
+        if (hasOtherOperator) {
+            checkFrais.disabled = true;
+            checkFrais.checked = false;
+            infoFrais.classList.remove('d-none');
+        } else {
+            checkFrais.disabled = false;
+            infoFrais.classList.add('d-none');
+        }
+    }
+
+    // Delegation pour l'input et la suppression
+    container.addEventListener('input', function(e) {
+        if (e.target.classList.contains('tel-input')) {
+            checkOperators();
+        }
+    });
+
+    container.addEventListener('click', function(e) {
+        if (e.target.closest('.btn-remove-dest')) {
+            const row = e.target.closest('.dest-row');
+            row.remove();
+            checkOperators();
+            
+            // Masquer le bouton de suppression s'il ne reste qu'un champ
+            const rows = document.querySelectorAll('.dest-row');
+            if (rows.length === 1) {
+                rows[0].querySelector('.btn-remove-dest').classList.add('d-none');
+            }
+        }
+    });
+
+    btnAdd.addEventListener('click', function() {
+        const div = document.createElement('div');
+        div.className = 'input-group mb-2 dest-row';
+        div.innerHTML = `
+            <input type="text" name="telephone_destinataire[]" class="form-control tel-input" placeholder="N° destinataire" required>
+            <button type="button" class="btn btn-outline-danger btn-remove-dest"><i class="bi bi-trash"></i></button>
+        `;
+        container.appendChild(div);
+        
+        // Afficher le bouton de suppression sur le premier champ s'il y a plus d'un champ
+        document.querySelector('.dest-row .btn-remove-dest').classList.remove('d-none');
+    });
+</script>
 
 <?= view('layouts/footer') ?>

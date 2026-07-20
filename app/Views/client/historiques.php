@@ -1,9 +1,10 @@
 <?= view('layouts/header', ['titre' => $titre ?? 'Historiques - Orange Money']) ?>
 
+<!-- Navbar Client -->
 <nav class="navbar navbar-expand-lg navbar-light navbar-orange mb-4">
     <div class="container">
         <a class="navbar-brand navbar-brand-text" href="/client/dashboard">
-            <img src="/img/logo.png" alt="Orange Money" class="brand-logo">
+            <div class="brand-circle">O</div>
             Orange Money
         </a>
         <div class="d-flex align-items-center gap-3">

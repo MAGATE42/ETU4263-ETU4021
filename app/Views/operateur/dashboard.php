@@ -4,6 +4,7 @@
     <h1 class="h2"><i class="bi bi-speedometer2 text-orange me-2"></i>Tableau de bord</h1>
 </div>
 
+<!-- Statistiques principales -->
 <div class="row g-4 mb-4">
     <div class="col-md-3">
         <div class="card shadow-sm h-100">
@@ -56,7 +57,8 @@
 </div>
 
 <div class="row">
-        <div class="col-lg-8 mb-4">
+    <!-- Dernières transactions -->
+    <div class="col-lg-8 mb-4">
         <div class="card shadow-sm h-100">
             <div class="card-header d-flex justify-content-between align-items-center bg-white py-3">
                 <h5 class="mb-0 fw-bold"><i class="bi bi-activity text-orange me-2"></i>Dernières opérations</h5>
@@ -106,7 +108,8 @@
         </div>
     </div>
 
-        <div class="col-lg-4 mb-4">
+    <!-- Répartition des gains -->
+    <div class="col-lg-4 mb-4">
         <div class="card shadow-sm h-100">
             <div class="card-header bg-white py-3">
                 <h5 class="mb-0 fw-bold"><i class="bi bi-pie-chart text-orange me-2"></i>Répartition des gains</h5>

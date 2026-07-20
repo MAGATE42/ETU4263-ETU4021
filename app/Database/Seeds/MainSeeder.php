@@ -14,11 +14,19 @@ class MainSeeder extends Seeder
     {
         // ─── 1. Préfixes Orange ────────────────────────────────────────
         $prefixes = [
-            ['prefixe' => '032', 'description' => 'Orange Madagascar - 032', 'actif' => 1, 'created_at' => date('Y-m-d H:i:s')],
-            ['prefixe' => '033', 'description' => 'Orange Madagascar - 033', 'actif' => 1, 'created_at' => date('Y-m-d H:i:s')],
-            ['prefixe' => '037', 'description' => 'Orange Madagascar - 037', 'actif' => 1, 'created_at' => date('Y-m-d H:i:s')],
+            ['prefixe' => '032', 'description' => 'Telma - 032 (Autre Operateur)', 'actif' => 1, 'est_autre_operateur' => 1, 'created_at' => date('Y-m-d H:i:s')],
+            ['prefixe' => '033', 'description' => 'Airtel - 033', 'actif' => 1, 'est_autre_operateur' => 0, 'created_at' => date('Y-m-d H:i:s')],
+            ['prefixe' => '034', 'description' => 'Telma - 034 (Autre Operateur)', 'actif' => 1, 'est_autre_operateur' => 1, 'created_at' => date('Y-m-d H:i:s')],
+            ['prefixe' => '037', 'description' => 'Orange Madagascar - 037', 'actif' => 1, 'est_autre_operateur' => 0, 'created_at' => date('Y-m-d H:i:s')],
         ];
         $this->db->table('prefixes')->insertBatch($prefixes);
+
+        // ─── 1.5. Configurations globales ──────────────────────────────
+        $this->db->table('configurations')->insert([
+            'cle'        => 'commission_transfert_externe',
+            'valeur'     => '5', // 5% par défaut
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
 
         // ─── 2. Types d'opérations ────────────────────────────────────
         $types = [

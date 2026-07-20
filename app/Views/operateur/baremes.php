@@ -5,7 +5,8 @@
 </div>
 
 <div class="row">
-        <div class="col-md-4 mb-4">
+    <!-- Formulaire ajout -->
+    <div class="col-md-4 mb-4">
         <div class="card shadow-sm">
             <div class="card-header bg-white py-3">
                 <h5 class="mb-0 fw-bold"><i class="bi bi-plus-circle text-orange me-2"></i>Ajouter une tranche</h5>
@@ -54,7 +55,8 @@
         </div>
     </div>
 
-        <div class="col-md-8">
+    <!-- Tableau barèmes -->
+    <div class="col-md-8">
         <div class="card shadow-sm">
             <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 fw-bold"><i class="bi bi-list text-orange me-2"></i>Barèmes configurés</h5>

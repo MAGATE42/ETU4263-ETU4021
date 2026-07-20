@@ -20,6 +20,7 @@ class TransactionModel extends Model
         'type_operation_id',
         'montant',
         'frais',
+        'commission_autre_operateur',
         'compte_destinataire_id',
         'statut',
         'note',
@@ -105,5 +106,41 @@ class TransactionModel extends Model
             ->getRow();
 
         return $row ? (float) $row->total : 0.0;
+    }
+
+    /**
+     * Calcule la commission totale perçue pour le compte des autres opérateurs
+     */
+    public function getTotalCommissionAutresOperateurs(): float
+    {
+        $row = $this->db->table('transactions t')
+            ->select('SUM(t.commission_autre_operateur) as total')
+            ->where('t.statut', 'success')
+            ->get()
+            ->getRow();
+
+        return $row ? (float) $row->total : 0.0;
+    }
+
+    /**
+     * Récupère les montants dus à chaque opérateur externe
+     * basé sur les transferts envoyés vers leurs préfixes
+     */
+    public function getMontantsDusAutresOperateurs(): array
+    {
+        // On récupère les transferts vers les comptes qui ont un préfixe d'autre opérateur
+        $result = $this->db->table('transactions t')
+            ->select('p.description as operateur_nom, p.prefixe, SUM(t.montant) as total_du')
+            ->join('types_operations to2', 'to2.id = t.type_operation_id')
+            ->join('comptes cd', 'cd.id = t.compte_destinataire_id')
+            ->join('prefixes p', 'cd.telephone LIKE p.prefixe || "%"')
+            ->where('t.statut', 'success')
+            ->where('to2.code', 'TRANSFERT')
+            ->where('p.est_autre_operateur', 1)
+            ->groupBy('p.id')
+            ->get()
+            ->getResultArray();
+
+        return $result;
     }
 }
