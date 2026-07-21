@@ -9,9 +9,9 @@ function isActive(string $path): string {
 <!-- Navbar Opérateur -->
 <nav class="navbar navbar-expand-lg navbar-light navbar-orange">
     <div class="container-fluid">
-        <a class="navbar-brand navbar-brand-text" href="/operateur">
-            <div class="brand-circle">O</div>
-            Orange Money <small class="text-muted" style="font-size: 0.8rem;"></small>
+        <a class="navbar-brand navbar-brand-text" href="/client">
+            <img src="<?= base_url('img/logo.png') ?>" alt="Orange Money" class="brand-logo">
+            <span>Orange Money</span>
         </a>
         <div class="d-flex align-items-center">
             <a href="/operateur/deconnexion" class="btn btn-danger btn-sm me-2">

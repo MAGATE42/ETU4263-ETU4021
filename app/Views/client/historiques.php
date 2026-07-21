@@ -3,9 +3,9 @@
 <!-- Navbar Client -->
 <nav class="navbar navbar-expand-lg navbar-light navbar-orange mb-4">
     <div class="container">
-        <a class="navbar-brand navbar-brand-text" href="/client/dashboard">
-            <div class="brand-circle">O</div>
-            Orange Money
+        <a class="navbar-brand navbar-brand-text" href="/client">
+            <img src="<?= base_url('img/logo.png') ?>" alt="Orange Money" class="brand-logo">
+            <span>Orange Money</span>
         </a>
         <div class="d-flex align-items-center gap-3">
             <span class="badge bg-orange-light text-orange border px-3 py-2">
