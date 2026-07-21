@@ -365,4 +365,27 @@ class UtilisateurController extends BaseController
         session()->destroy();
         return redirect()->to('/client')->with('success', 'Vous avez été déconnecté avec succès.');
     }
+    
+    public function sauvegarderConfigurations(): \CodeIgniter\HTTP\RedirectResponse
+    {
+        
+        $pourcentage = (float) $this->request->getPost('pourcentage_epargne');
+        
+        if ($pourcentage < 0) {
+            return redirect()->back()->with('erreur', 'La pourcentage ne peut pas être négative.');
+        }
+
+        $this->configModel->setValeur('pourcentage_depargne', (string) $pourcentage);
+
+        return redirect()->back()->with('success', 'Configurations sauvegardées.');
+    }
+
+    public function voirConfiguration(): string|\CodeIgniter\HTTP\RedirectResponse
+    {
+        if (!session()->get('client_connecte')) {
+            return redirect()->to('/client');
+        }
+
+        return view('client/configuration');
+    }
 }

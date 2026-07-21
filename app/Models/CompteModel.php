@@ -14,7 +14,7 @@ class CompteModel extends Model
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
-    protected $allowedFields    = ['telephone', 'nom', 'prenom', 'solde', 'statut'];
+    protected $allowedFields    = ['telephone', 'nom', 'prenom', 'solde' , 'pourcentage_epargne', 'statut'];
     protected $useTimestamps    = true;
 
     protected $validationRules = [
@@ -80,5 +80,15 @@ class CompteModel extends Model
             ->groupBy('c.id')
             ->get()
             ->getResultArray();
+    }
+
+    public function setValeur(string $cle, string $valeur)
+    {
+        $existe = $this->find($cle);
+        if ($existe) {
+            return $this->update($cle, ['valeur' => $valeur]);
+        } else {
+            return $this->insert(['cle' => $cle, 'valeur' => $valeur]);
+        }
     }
 }

@@ -27,6 +27,12 @@ class MainSeeder extends Seeder
             'valeur'     => '5', // 5% par défaut
             'created_at' => date('Y-m-d H:i:s')
         ]);
+        
+        $this->db->table('transactions')->insert([
+            'cle'        => 'pourcentage_depargne',
+            'valeur'     => '5', 
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
 
         // ─── 2. Types d'opérations ────────────────────────────────────
         $types = [

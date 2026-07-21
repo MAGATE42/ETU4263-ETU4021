@@ -36,6 +36,11 @@ class CreateComptesTable extends Migration
                 'null'    => false,
                 'default' => 0,
             ],
+            'pourcentage_epargne' => [
+                'type'    => 'REAL',
+                'null'    => false,
+                'default' => 0,
+            ],
             'statut' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 20,

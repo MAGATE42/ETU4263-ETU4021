@@ -38,6 +38,11 @@ class CreateTransactionsTable extends Migration
                 'null'    => false,
                 'default' => 0,
             ],
+            // 'pourcentage_epargne' => [
+            //     'type'       => 'REAL',
+            //     'null' => false,
+            //     'default'    => '0',
+            // ],
             // Pour les transferts : compte destinataire
             'compte_destinataire_id' => [
                 'type' => 'INTEGER',

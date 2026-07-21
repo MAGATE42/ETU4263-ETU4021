@@ -13,6 +13,7 @@
             </span>
             <a href="/client/historiques" class="btn btn-outline-secondary btn-sm d-none d-md-inline-block">Historique</a>
             <a href="/client/deconnexion" class="btn btn-danger btn-sm">Quitter</a>
+            <a href="/client/configuration" class="btn btn-danger btn-sm">Configuration epargne</a>
         </div>
     </div>
 </nav>

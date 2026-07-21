@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS `comptes` (
   `nom`        VARCHAR(100),
   `prenom`     VARCHAR(100),
   `solde`      REAL NOT NULL DEFAULT 0,
+  `pourcentage_epargne`      REAL NOT NULL DEFAULT 0,
   `statut`     VARCHAR(20) DEFAULT 'actif',  -- actif | suspendu | fermé
   `created_at` DATETIME,
   `updated_at` DATETIME
@@ -63,6 +64,7 @@ CREATE TABLE IF NOT EXISTS `transactions` (
   `compte_id`                   INTEGER NOT NULL,
   `type_operation_id`           INTEGER NOT NULL,
   `montant`                     REAL NOT NULL,
+  -- `pourcentage_epargne`                 REAL NOT NULL DEFAULT 0,
   `frais`                       REAL NOT NULL DEFAULT 0,
   `commission_autre_operateur`  REAL DEFAULT 0,   -- [V2] Commission prélevée sur transferts externes
   `compte_destinataire_id`      INTEGER,           -- NULL sauf pour transferts

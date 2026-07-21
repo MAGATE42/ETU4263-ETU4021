@@ -18,6 +18,8 @@ $routes->group('client', function ($routes) {
     $routes->post('transfert',            'UtilisateurController::faireTransfert');
     $routes->get('historiques',           'UtilisateurController::voirHistoriques');
     $routes->get('deconnexion',           'UtilisateurController::deconnexion');
+    $routes->post('sauvegarder','UtilisateurController::sauvegarderConfigurations');
+    $routes->get('configuration','UtilisateurController::voirConfiguration');
 });
 
 
