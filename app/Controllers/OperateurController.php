@@ -75,20 +75,16 @@ class OperateurController extends BaseController
     {
         $identifiant = trim((string) $this->request->getPost('identifiant'));
         $motDePasse   = (string) $this->request->getPost('mot_de_passe');
-
         if ($identifiant === '' || $motDePasse === '') {
             return redirect()->to('/operateur')->with('erreur', 'Veuillez saisir l’identifiant et le mot de passe.');
         }
-
         if ($identifiant !== self::OPERATEUR_IDENTIFIANT || $motDePasse !== self::OPERATEUR_MOT_DE_PASSE) {
             return redirect()->to('/operateur')->with('erreur', 'Identifiants opérateur invalides.');
         }
-
         session()->set([
             'operateur_connecte' => true,
             'operateur_identifiant' => $identifiant,
         ]);
-
         return redirect()->to('/operateur')->with('success', 'Connexion opérateur réussie.');
     }
 

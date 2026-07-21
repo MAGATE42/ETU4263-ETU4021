@@ -46,6 +46,26 @@ class BaremeFraisModel extends Model
                        ->first();
 
         return $bareme ? (float) $bareme['frais'] : 0.0;
+        if (!$bareme){
+            return 0.0;
+        }
+        if ($bareme['type_frais'] == 'pourcentage'){
+            return($montant * $bareme['type_frais']);
+        }
+        return(float)$bareme['type_frais'];
+    }
+    public function calculerFraisAvecType(int $typeOperationId, float $montant){
+                $bareme = $this->where('type_operation_id', $typeOperationId)
+                       ->where('montant_min <=', $montant)
+                       ->where('montant_max >=', $montant)
+                       ->first();
+            if (!$bareme){
+            return 0.0;
+
+            $typeFrais=$type ? 
+        }
+                
+            
     }
 
     /**
