@@ -1,5 +1,3 @@
-
-
 -- ─── TABLE : prefixes ───────────────────────────────────────────────────
 -- Stocke les préfixes téléphoniques valides.
 -- est_autre_operateur = 1 → Autre opérateur (commission applicable)
@@ -39,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `baremes_frais` (
   `frais`             REAL NOT NULL DEFAULT 0,
   `created_at`        DATETIME,
   `updated_at`        DATETIME,
-  FOREIGN KEY (`type_operation_id`) REFERENCES `types_operations`(`id`)
+  FOREIGN KEY (`type_operation_id`) REFERENCES `types_operations`(`id`) 
 );
 
 -- ─── TABLE : comptes ────────────────────────────────────────────────────
