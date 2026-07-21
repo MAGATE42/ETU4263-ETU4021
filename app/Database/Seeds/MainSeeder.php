@@ -95,5 +95,10 @@ class MainSeeder extends Seeder
             ],
         ];
         $this->db->table('comptes')->insertBatch($comptes);
+        $this->db->table('configuration')->insert([
+            'clé' => 'commission_transfert',
+            'valeur' => '0',
+            'created_at' => date('Y-m-d'),
+        ]);
     }
 }
