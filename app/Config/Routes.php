@@ -23,6 +23,9 @@ $routes->group('client', function ($routes) {
 
 $routes->group('operateur', function ($routes) {
     $routes->get('/',                     'OperateurController::index');
+    $routes->post('login',                'OperateurController::login');
+    $routes->get('deconnexion',           'OperateurController::deconnexion');
+    $routes->get('login',                 'OperateurController::index');
     $routes->get('prefixes',              'OperateurController::gererPrefixes');
     $routes->post('prefixes/ajouter',     'OperateurController::ajouterPrefixe');
     $routes->post('prefixes/supprimer/(:num)', 'OperateurController::supprimerPrefixe/$1');

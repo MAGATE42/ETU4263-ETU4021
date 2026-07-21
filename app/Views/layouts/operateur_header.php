@@ -11,9 +11,12 @@ function isActive(string $path): string {
     <div class="container-fluid">
         <a class="navbar-brand navbar-brand-text" href="/operateur">
             <div class="brand-circle">O</div>
-            Orange Money <small class="text-muted" style="font-size: 0.8rem;">Espace Opérateur</small>
+            Orange Money <small class="text-muted" style="font-size: 0.8rem;"></small>
         </a>
         <div class="d-flex align-items-center">
+            <a href="/operateur/deconnexion" class="btn btn-danger btn-sm me-2">
+                <i class="bi bi-box-arrow-right me-1"></i>Déconnexion
+            </a>
             <a href="/client" class="btn btn-outline-secondary btn-sm">
                 <i class="bi bi-person-circle me-1"></i>Espace client
             </a>
